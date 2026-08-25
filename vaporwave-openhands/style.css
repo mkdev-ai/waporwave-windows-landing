@@ -1,0 +1,401 @@
+/* ================= THEMES =================
+   The sun is the theme switcher. Click it. */
+:root {
+  --bg-top: #2b1055; --bg-bot: #7597de;
+  --sun-a: #ff6bcb; --sun-b: #ffb86c;
+  --grid: #ff71ce; --grid-dim: rgb(255 113 206 / 32%);
+  --neon-pink: #ff71ce; --neon-cyan: #01cdfe; --neon-yellow: #fffb96; --neon-purple: #b967ff;
+  --sky-star: #fff;
+  --haze: rgb(255 113 206 / 12%);
+}
+
+[data-theme="dawn"] {
+  --bg-top: #1a0533; --bg-bot: #ff9a8b;
+  --sun-a: #ffd319; --sun-b: #ff2975;
+  --grid: #01cdfe; --grid-dim: rgb(1 205 254 / 30%);
+  --neon-pink: #ff2975; --neon-cyan: #ffd319; --neon-yellow: #fffb96; --neon-purple: #b967ff;
+  --haze: rgb(255 211 25 / 10%);
+}
+
+[data-theme="midnight"] {
+  --bg-top: #000428; --bg-bot: #004e92;
+  --sun-a: #b967ff; --sun-b: #01cdfe;
+  --grid: #05ffa1; --grid-dim: rgb(5 255 161 / 28%);
+  --neon-pink: #05ffa1; --neon-cyan: #b967ff; --neon-yellow: #01cdfe; --neon-purple: #ff71ce;
+  --haze: rgb(5 255 161 / 10%);
+}
+
+[data-theme="overdrive"] {
+  --bg-top: #3d0000; --bg-bot: #ff5e00;
+  --sun-a: #fffb96; --sun-b: #ff0844;
+  --grid: #fffb96; --grid-dim: rgb(255 251 150 / 28%);
+  --neon-pink: #fffb96; --neon-cyan: #ff0844; --neon-yellow: #05ffa1; --neon-purple: #ff71ce;
+  --sky-star: #ffd319;
+  --haze: rgb(255 8 68 / 12%);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: "Courier New", monospace;
+  background: linear-gradient(var(--bg-top), var(--bg-bot));
+  transition: background 1.2s ease;
+  cursor: crosshair;
+  user-select: none;
+}
+
+/* ================= SKY ================= */
+#sky { position: fixed; inset: 0; overflow: hidden; }
+.star {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  background: var(--sky-star); opacity: 0.8;
+  animation: twinkle 3s infinite ease-in-out;
+}
+@keyframes twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.9; } }
+
+/* The sun: striped, glowing, and it is ALSO the theme button */
+#sun {
+  position: absolute; left: 50%; top: 8%; transform: translateX(-50%);
+  width: min(38vmin, 340px); height: min(38vmin, 340px);
+  border-radius: 50%;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--sun-a) 0%, var(--sun-a) 8%,
+    transparent 8%, transparent 9%,
+    var(--sun-b) 9%, var(--sun-b) 17%,
+    transparent 17%, transparent 18.5%
+  );
+  box-shadow: 0 0 60px var(--sun-a), 0 0 160px var(--sun-b);
+  cursor: pointer;
+  transition: box-shadow 1.2s ease;
+  animation: sunFloat 8s ease-in-out infinite;
+  z-index: 2;
+}
+#sun:hover { animation-play-state: paused; box-shadow: 0 0 90px var(--sun-a), 0 0 240px var(--sun-b); }
+@keyframes sunFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(14px); }
+}
+
+#sun-hint {
+  position: absolute; left: 50%; top: calc(8% + min(38vmin, 340px) + 14px);
+  transform: translateX(-50%);
+  color: var(--neon-yellow); font-size: 12px; letter-spacing: 3px;
+  text-shadow: 0 0 8px var(--neon-yellow);
+  animation: blink 1.6s steps(2) infinite;
+  z-index: 2; white-space: nowrap;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Mountains (pure CSS clip-path) */
+.mountain {
+  position: absolute; bottom: 34vh; width: 60vw; height: 22vh;
+  background: linear-gradient(#0f0524, #2b1055);
+  clip-path: polygon(0 100%, 18% 40%, 32% 70%, 50% 15%, 68% 65%, 84% 35%, 100% 100%);
+  opacity: 0.9;
+}
+#mtn-l { left: -8vw; }
+#mtn-r { right: -8vw; transform: scaleX(-1); }
+
+/* ================= GRID FLOOR ================= */
+#grid-wrap {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 36vh;
+  perspective: 320px; overflow: hidden; z-index: 1;
+  background: linear-gradient(transparent, rgb(4 0 18 / 90%) 35%);
+}
+#grid {
+  position: absolute; inset: -100% -50% 0;
+  background:
+    linear-gradient(var(--grid-dim) 2px, transparent 2px),
+    linear-gradient(90deg, var(--grid-dim) 2px, transparent 2px),
+    linear-gradient(rgb(6 0 22 / 55%), rgb(6 0 22 / 88%));
+  background-size: 60px 60px;
+  transform: rotateX(72deg);
+  animation: gridScroll 1.4s linear infinite;
+  border-top: 3px solid var(--grid);
+  box-shadow: 0 -6px 40px var(--grid-dim);
+}
+@keyframes gridScroll { to { background-position: 0 60px, 0 0; } }
+.ripple {
+  position: absolute; border: 2px solid var(--neon-cyan); border-radius: 50%;
+  transform: translate(-50%, -50%); pointer-events: none;
+  animation: rippleOut 1s ease-out forwards;
+}
+@keyframes rippleOut {
+  from { width: 8px; height: 8px; opacity: 1; box-shadow: 0 0 20px var(--neon-cyan); }
+  to { width: 260px; height: 260px; opacity: 0; }
+}
+#haze {
+  position: fixed; inset: 0; pointer-events: none; z-index: 3;
+  background: radial-gradient(ellipse at 50% 30%, transparent 40%, var(--haze) 100%);
+}
+/* Scanlines over everything — it's a CRT, after all */
+#crt {
+  position: fixed; inset: 0; pointer-events: none; z-index: 60;
+  background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 13%) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+/* ================= TITLE ================= */
+#title {
+  position: fixed; top: 3.5%; left: 50%; transform: translateX(-50%);
+  text-align: center; z-index: 10; pointer-events: none; width: 100%;
+}
+#title h1 {
+  font-size: clamp(28px, 6vw, 64px); letter-spacing: 0.32em; font-weight: 700;
+  color: var(--neon-cyan);
+  text-shadow: 3px 3px 0 var(--neon-pink), -2px -2px 0 var(--neon-purple), 0 0 30px var(--neon-cyan);
+  font-style: italic;
+}
+#title p {
+  margin-top: 6px; color: var(--neon-yellow); letter-spacing: 5px;
+  font-size: clamp(10px, 1.6vw, 15px); text-shadow: 0 0 10px var(--neon-yellow);
+}
+
+/* ================= WIN95 PANELS ================= */
+.win95 {
+  position: fixed; z-index: 20; width: min(430px, 92vw);
+  background: #c3c7cb; border: 2px solid;
+  border-color: #fff #0a0a0a #0a0a0a #fff;
+  box-shadow: 6px 6px 0 rgb(0 0 0 / 45%), 0 0 30px var(--grid-dim);
+  font-family: "Courier New", monospace;
+}
+.win95.hidden { display: none; }
+.win95-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #fff; padding: 4px 6px; cursor: move; font-size: 13px; font-weight: bold;
+  letter-spacing: 1px; touch-action: none;
+}
+.win95-bar .btns { margin-left: auto; display: flex; gap: 4px; }
+.win95-bar button {
+  width: 18px; height: 16px; font-size: 10px; line-height: 1;
+  background: #c3c7cb; border: 1px solid; border-color: #fff #0a0a0a #0a0a0a #fff;
+  cursor: pointer;
+}
+.win95-body { padding: 12px; font-size: 13px; line-height: 1.5; color: #111; }
+.win95-body h2 { font-size: 13px; margin-bottom: 6px; color: #000080; }
+.win95-body ul { list-style: none; margin: 8px 0; }
+.win95-body li { padding: 3px 0 3px 20px; position: relative; }
+.win95-body li::before { content: "▸"; position: absolute; left: 4px; color: #000080; }
+.win95-body a { color: #000080; }
+.win95-body .ok {
+  margin-top: 8px; padding: 4px 18px; font-family: inherit; font-size: 13px;
+  background: #c3c7cb; border: 2px solid; border-color: #fff #0a0a0a #0a0a0a #fff;
+  cursor: pointer;
+}
+.win95-body .ok:active { border-color: #0a0a0a #fff #fff #0a0a0a; }
+.win95-body .docs-link {
+  display: inline-block; margin-top: 10px; padding: 5px 14px; font-weight: bold; font-size: 12px;
+  letter-spacing: 1px; text-decoration: none; color: #000080;
+  background: #c3c7cb; border: 2px solid; border-color: #fff #0a0a0a #0a0a0a #fff;
+}
+.win95-body .docs-link:active { border-color: #0a0a0a #fff #fff #0a0a0a; }
+
+#win-capabilities { left: 4vw; top: 20vh; }
+#win-help { right: 4vw; top: 14vh; width: min(300px, 80vw); }
+.site-win { width: min(400px, 92vw); }
+#win-canvas { left: 26vw; top: 17vh; }
+#win-sdk { left: 32vw; top: 23vh; }
+#win-cloud { left: 38vw; top: 29vh; }
+
+/* ================= NEON MALL ================= */
+#mall {
+  position: fixed; bottom: 37vh; right: 3vw; z-index: 5; text-align: center;
+}
+.sign {
+  display: block; margin: 10px 0; padding: 8px 20px;
+  font-size: clamp(15px, 2.4vw, 26px); font-weight: bold; letter-spacing: 4px;
+  text-decoration: none; cursor: pointer;
+  border: 3px solid transparent;
+  border-image: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan), var(--neon-purple)) 1;
+  background: rgb(0 0 10 / 50%); backdrop-filter: blur(2px);
+  transform: skewX(-4deg);
+  animation: neonFlicker 4s infinite;
+  transition: transform 0.15s ease;
+}
+.sign::before { content: "◤ "; }
+.sign::after { content: " ◢"; }
+.sign:hover { transform: skewX(-4deg) scale(1.06); animation: glitch 0.3s infinite; }
+.sign-pink   { color: var(--neon-pink);   text-shadow: 0 0 12px var(--neon-pink),   0 0 40px var(--neon-pink); }
+.sign-cyan   { color: var(--neon-cyan);   text-shadow: 0 0 12px var(--neon-cyan),   0 0 40px var(--neon-cyan); animation-delay: 1.2s; }
+.sign-purple { color: var(--neon-purple); text-shadow: 0 0 12px var(--neon-purple), 0 0 40px var(--neon-purple); animation-delay: 2.4s; }
+@keyframes neonFlicker {
+  0%, 6%, 8%, 100% { opacity: 1; }
+  7% { opacity: 0.35; }
+  52% { opacity: 0.8; }
+  54% { opacity: 1; }
+}
+@keyframes glitch {
+  0% { text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-pink), 0 0 20px currentColor; }
+  50% { text-shadow: -3px 1px var(--neon-cyan), 3px -1px var(--neon-pink), 0 0 30px currentColor; }
+  100% { text-shadow: 2px -1px var(--neon-cyan), -2px 1px var(--neon-pink), 0 0 20px currentColor; }
+}
+
+/* ================= MIXTAPE DECK ================= */
+#deck {
+  position: fixed; bottom: 74px; left: 4vw; z-index: 15;
+  width: min(360px, 88vw);
+  background: linear-gradient(160deg, #2a0a4a, #12041f);
+  border: 2px solid var(--neon-purple); border-radius: 10px;
+  box-shadow: 0 0 24px var(--grid-dim), inset 0 0 30px rgb(0 0 0 / 60%);
+  padding: 12px;
+}
+#deck h2 {
+  color: var(--neon-yellow); font-size: 12px; letter-spacing: 3px;
+  text-shadow: 0 0 8px var(--neon-yellow); margin-bottom: 8px;
+}
+.track {
+  display: flex; gap: 8px; align-items: baseline;
+  color: var(--neon-cyan); font-size: 12px; padding: 5px 8px; cursor: pointer;
+  border: 1px solid transparent; letter-spacing: 1px;
+}
+.track:hover { border-color: var(--neon-cyan); }
+.track.playing {
+  color: var(--neon-pink); border-color: var(--neon-pink);
+  text-shadow: 0 0 8px var(--neon-pink);
+  background: rgb(255 113 206 / 8%);
+}
+.track .num { color: var(--neon-purple); }
+#track-info {
+  margin-top: 8px; min-height: 54px; padding: 8px;
+  color: var(--neon-yellow); font-size: 11.5px; line-height: 1.5;
+  border-top: 1px dashed var(--neon-purple);
+  text-shadow: 0 0 6px var(--grid-dim);
+}
+#audio-btn {
+  margin-top: 8px; width: 100%; padding: 6px; font-family: inherit; font-size: 12px;
+  letter-spacing: 2px; cursor: pointer; color: var(--neon-pink);
+  background: transparent; border: 2px solid var(--neon-pink); border-radius: 6px;
+  text-shadow: 0 0 8px var(--neon-pink);
+}
+#audio-btn:hover { background: rgb(255 113 206 / 12%); }
+
+/* ================= TASKBAR ================= */
+#taskbar {
+  position: fixed; left: 0; right: 0; bottom: 26px; height: 40px; z-index: 40;
+  display: flex; align-items: center; gap: 6px; padding: 4px 6px;
+  background: #c3c7cb;
+  border-top: 2px solid #fff;
+  box-shadow: 0 -3px 10px rgb(0 0 0 / 50%);
+  font-family: "Courier New", monospace;
+  overflow: auto hidden;
+}
+#taskbar button {
+  font-family: inherit; font-size: 12px; font-weight: bold; padding: 7px 12px;
+  background: #c3c7cb; border: 2px solid; border-color: #fff #0a0a0a #0a0a0a #fff;
+  cursor: pointer; white-space: nowrap; flex: 0 0 auto; color: #000;
+}
+#taskbar button.active { border-color: #0a0a0a #fff #fff #0a0a0a; background: #a8adb3; }
+#task-buttons { display: flex; gap: 6px; flex: 0 0 auto; }
+#gridfx-btn { margin-left: auto; color: #000080; flex: 0 0 auto; }
+
+/* ================= VAPORWAVE GRAPHICS =================
+   All graphics are original hand-crafted inline SVG / pure CSS. */
+
+/* Palm tree silhouettes */
+.palm { position: fixed; bottom: 33vh; z-index: 4; width: clamp(70px, 11vw, 150px);
+  animation: sway 6s ease-in-out infinite; transform-origin: bottom center;
+  filter: drop-shadow(0 0 4px rgb(0 0 0 / 90%)) drop-shadow(0 0 14px var(--grid-dim)); }
+.palm svg { display: block; width: 100%; height: auto; }
+#palm-a { left: 1vw; }
+#palm-b { right: 24vw; width: clamp(45px, 7vw, 90px); animation-delay: 2s; }
+@keyframes sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2.5deg); } }
+
+/* Dolphins leaping out of the grid */
+.dolphin { position: fixed; bottom: 33vh; z-index: 4; width: clamp(60px, 9vw, 120px);
+  filter: drop-shadow(0 0 5px var(--neon-cyan)) drop-shadow(0 0 18px var(--grid-dim)); }
+.dolphin svg { display: block; width: 100%; height: auto; }
+#dolphin-a { left: 30vw; animation: leapA 7s ease-in-out infinite; }
+#dolphin-b { left: 57vw; width: clamp(42px, 6vw, 84px); animation: leapB 9s ease-in-out infinite 2.5s; }
+#dolphin-b svg { transform: scaleX(-1); }
+@keyframes leapA {
+  0%, 52%, 100% { transform: translateY(40px) rotate(24deg); opacity: 0; }
+  60% { opacity: 1; }
+  74% { transform: translateY(-50px) rotate(-16deg); opacity: 1; }
+  88% { transform: translateY(24px) rotate(-48deg); opacity: 1; }
+  94% { transform: translateY(40px) rotate(-56deg); opacity: 0; }
+}
+@keyframes leapB {
+  0%, 55%, 100% { transform: translateY(34px) rotate(-20deg); opacity: 0; }
+  63% { opacity: 1; }
+  76% { transform: translateY(-40px) rotate(14deg); opacity: 1; }
+  89% { transform: translateY(20px) rotate(44deg); opacity: 1; }
+  95% { transform: translateY(34px) rotate(52deg); opacity: 0; }
+}
+
+/* Greek bust statue */
+#statue { position: fixed; right: 1.5vw; bottom: 30vh; z-index: 4;
+  width: clamp(70px, 9vw, 130px);
+  animation: statueGlow 5s ease-in-out infinite; }
+#statue svg { display: block; width: 100%; height: auto; }
+@keyframes statueGlow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgb(0 0 0 / 90%)) drop-shadow(0 0 10px var(--grid-dim)); }
+  50% { filter: drop-shadow(0 0 5px rgb(0 0 0 / 90%)) drop-shadow(0 0 24px var(--neon-purple)); }
+}
+
+/* Floating checkerboard plane */
+#checker {
+  position: fixed; left: 45vw; bottom: 29vh; z-index: 3; width: 90px; height: 90px;
+  background: repeating-conic-gradient(var(--neon-pink) 0% 25%, rgb(0 0 10 / 10%) 0% 50%) 0 0 / 22px 22px;
+  opacity: 0.45;
+  animation: floatChk 9s ease-in-out infinite;
+}
+@keyframes floatChk {
+  0%, 100% { transform: rotateX(64deg) rotate(8deg) translateY(0); }
+  50% { transform: rotateX(64deg) rotate(8deg) translateY(-14px); }
+}
+
+/* VHS overlay glyph */
+#vhs {
+  position: fixed; top: 12px; right: 16px; z-index: 30;
+  color: #fff; font-size: 14px; letter-spacing: 3px;
+  text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan);
+  animation: blink 1.4s steps(2) infinite;
+}
+
+/* ================= BOOT SCREEN ================= */
+#boot {
+  position: fixed; inset: 0; z-index: 100; background: #000;
+  color: #0f0; font-size: 14px; padding: 24px; line-height: 1.7;
+  white-space: pre-wrap; cursor: pointer;
+}
+#boot .cursor { animation: blink 0.8s steps(2) infinite; }
+
+/* ================= MARQUEE ================= */
+#marquee {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+  background: rgb(0 0 16 / 70%); border-top: 1px solid var(--grid);
+  overflow: hidden; height: 26px;
+}
+#marquee span {
+  display: inline-block; white-space: nowrap; padding-left: 100%;
+  color: var(--grid); font-size: 12px; letter-spacing: 3px; line-height: 26px;
+  animation: crawl 24s linear infinite; text-shadow: 0 0 8px var(--grid);
+}
+@keyframes crawl { to { transform: translateX(-100%); } }
+
+/* ================= MOBILE ================= */
+@media (width <= 720px) {
+  #title h1 { font-size: 24px; letter-spacing: 0.2em; }
+  #title p { font-size: 9px; letter-spacing: 2px; }
+  #sun { top: 10%; }
+  #sun-hint { top: calc(10% + min(38vmin, 340px) + 10px); font-size: 10px; }
+  .mountain { bottom: 30vh; }
+  #grid-wrap { height: 30vh; }
+  .palm { bottom: 27vh; }
+  #palm-a { width: 56px; }
+  #palm-b, #statue, #checker, #vhs { display: none; }
+  .dolphin { bottom: 27vh; width: 48px; }
+  #dolphin-a { left: 20vw; }
+  #dolphin-b { left: 62vw; }
+  #mall { top: 19vh; bottom: auto; right: 2vw; }
+  .sign { font-size: 12px; padding: 10px 12px; margin: 6px 0; letter-spacing: 2px; }
+  #deck { left: 2vw; right: 2vw; width: auto; bottom: 74px; max-height: 32vh; overflow-y: auto; }
+  .track { min-height: 40px; align-items: center; }
+  .win95 { width: 94vw; max-height: 60vh; }
+  .win95-body { max-height: 50vh; overflow-y: auto; }
+  #win-capabilities, #win-help, #win-canvas, #win-sdk, #win-cloud { inset: 6vh auto auto 3vw; }
+  #taskbar { height: 46px; }
+  #taskbar button { min-height: 38px; padding: 8px 12px; }
+}
