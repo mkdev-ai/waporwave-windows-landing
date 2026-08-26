@@ -1,7 +1,7 @@
 # Asset Credits
 
 All graphics on this page — palm trees, leaping dolphins, the Greek bust statue,
-checkerboard plane, striped sun, mountains, and grid floor — are original,
+striped sun, mountains, and grid floor — are original,
 hand-crafted inline SVG paths and pure CSS created specifically for this project.
 
 No external image, audio, or font assets are used. The synthwave soundtrack is
