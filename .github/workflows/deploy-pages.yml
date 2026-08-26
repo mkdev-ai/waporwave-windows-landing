@@ -1,0 +1,36 @@
+name: Deploy preview to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["vaporwave-openhands/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish vaporwave-openhands/ to gh-pages:preview/
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -rf /tmp/preview && mkdir -p /tmp/preview
+          cp -r vaporwave-openhands/. /tmp/preview/
+
+          git fetch origin gh-pages
+          git checkout gh-pages
+          rm -rf preview
+          mv /tmp/preview preview
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes to deploy."
+            exit 0
+          fi
+          git commit -m "Deploy preview from main@${{ github.sha }}"
+          git push origin gh-pages
