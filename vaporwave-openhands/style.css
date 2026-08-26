@@ -293,6 +293,9 @@ body {
 /* ================= VAPORWAVE GRAPHICS =================
    All graphics are original hand-crafted inline SVG / pure CSS. */
 
+/* Hidden shape library: <symbol> definitions instanced via <use> */
+.svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
 /* Palm tree silhouettes */
 .palm { position: fixed; bottom: 33vh; z-index: 4; width: clamp(70px, 11vw, 150px);
   animation: sway 6s ease-in-out infinite; transform-origin: bottom center;

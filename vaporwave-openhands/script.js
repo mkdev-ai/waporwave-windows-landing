@@ -50,19 +50,26 @@ gridfxBtn.addEventListener("click", () => {
   gridFx = !gridFx;
   gridfxBtn.textContent = gridFx ? "GRID FX: ON" : "GRID FX: OFF";
 });
-const grid = document.getElementById("grid");
-document.getElementById("grid-wrap").addEventListener("click", (e) => {
+const gridWrap = document.getElementById("grid-wrap");
+gridWrap.addEventListener("click", (e) => {
   if (!gridFx) return;
   const r = document.createElement("div");
   r.className = "ripple";
-  const rect = grid.getBoundingClientRect();
+  // #grid is 3D-rotated, so its bounding rect can't map screen clicks to local
+  // coordinates. Position in the untransformed wrap instead: ripple lands exactly
+  // under the cursor.
+  const rect = gridWrap.getBoundingClientRect();
   r.style.left = e.clientX - rect.left + "px";
   r.style.top = e.clientY - rect.top + "px";
-  grid.appendChild(r);
+  gridWrap.appendChild(r);
   setTimeout(() => r.remove(), 1000);
 });
 
 /* ---------- window system: registry, taskbar, close, drag ---------- */
+// px of a window that must stay on screen: wide enough that a window clamped to
+// the left edge still shows some grabbable bar left of its buttons (~46px).
+const DRAG_MARGIN = 80;
+
 const WINDOWS = [
   { id: "win-capabilities", label: "CAPABILITIES.TXT" },
   { id: "win-help", label: "HELP.TXT" },
@@ -75,7 +82,18 @@ function setWindowVisible(id, visible) {
   const win = document.getElementById(id);
   if (!win) return;
   win.classList.toggle("hidden", !visible);
-  if (visible) win.style.zIndex = ++topZ;
+  if (visible) {
+    // A window stranded fully off-screen (e.g. by a viewport resize) snaps back
+    // to its CSS home position so the taskbar can never lose it for good.
+    const r = win.getBoundingClientRect();
+    if (r.right < 0 || r.left > window.innerWidth || r.bottom < 0 || r.top > window.innerHeight) {
+      win.style.left = "";
+      win.style.right = "";
+      win.style.top = "";
+      win.style.bottom = "";
+    }
+    win.style.zIndex = ++topZ;
+  }
   const btn = document.querySelector('[data-win-btn="' + id + '"]');
   if (btn) btn.classList.toggle("active", visible);
 }
@@ -116,8 +134,10 @@ document.querySelectorAll(".win95").forEach((win) => {
   });
   bar.addEventListener("pointermove", (e) => {
     if (!dragging) return;
-    win.style.left = e.clientX - dx + "px";
-    win.style.top = e.clientY - dy + "px";
+    const left = Math.min(Math.max(e.clientX - dx, DRAG_MARGIN - win.offsetWidth), window.innerWidth - DRAG_MARGIN);
+    const top = Math.min(Math.max(e.clientY - dy, 0), window.innerHeight - DRAG_MARGIN);
+    win.style.left = left + "px";
+    win.style.top = top + "px";
     win.style.right = "auto";
     win.style.bottom = "auto";
   });
