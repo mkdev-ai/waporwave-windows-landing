@@ -74,7 +74,8 @@ PRESS ANY KEY OR CLICK ANYWHERE TO ENTER
   <div class="win95-bar">
     <span>⚠ C:\AGENT\CAPABILITIES.TXT — Notepad</span>
     <div class="btns">
-      <button type="button" data-close="win-capabilities" title="minimize">_</button>
+      <button type="button" data-min="win-capabilities" title="minimize">_</button>
+      <button type="button" data-max="win-capabilities" title="maximize">□</button>
       <button type="button" data-close="win-capabilities" title="close">×</button>
     </div>
   </div>
@@ -97,14 +98,19 @@ PRESS ANY KEY OR CLICK ANYWHERE TO ENTER
 <aside class="win95 hidden" id="win-help" aria-label="Help">
   <div class="win95-bar">
     <span>HELP.TXT</span>
-    <div class="btns"><button type="button" data-close="win-help" title="close">×</button></div>
+    <div class="btns">
+      <button type="button" data-min="win-help" title="minimize">_</button>
+      <button type="button" data-max="win-help" title="maximize">□</button>
+      <button type="button" data-close="win-help" title="close">×</button>
+    </div>
   </div>
   <div class="win95-body">
     ▸ <b>CLICK THE SUN</b> to shift the timeline (4 realities)<br>
-    ▸ <b>DRAG</b> windows by their blue bars<br>
+    ▸ <b>DRAG</b> windows by their blue bars; <b>□</b> toggles full screen<br>
+    ▸ <b>_</b> hides a window to the taskbar — its button brings it back<br>
+    ▸ <b>×</b> closes a window for good — reopen it from <b>◤ START</b><br>
     ▸ <b>CLICK THE GRID</b> to disturb the floor (GRID FX toggle in the taskbar)<br>
     ▸ <b>PICK A TRACK</b> — each one retunes the synth live<br>
-    ▸ <b>TASKBAR</b> reopens any closed window<br>
     ▸ <b>SYNTH</b> button = real audio. headphones on.
   </div>
 </aside>
@@ -113,7 +119,11 @@ PRESS ANY KEY OR CLICK ANYWHERE TO ENTER
 <section class="win95 site-win hidden" id="win-canvas" aria-label="Agent Canvas">
   <div class="win95-bar">
     <span>◤ C:\PRODUCTS\AGENT_CANVAS.TXT</span>
-    <div class="btns"><button type="button" data-close="win-canvas" title="close">×</button></div>
+    <div class="btns">
+      <button type="button" data-min="win-canvas" title="minimize">_</button>
+      <button type="button" data-max="win-canvas" title="maximize">□</button>
+      <button type="button" data-close="win-canvas" title="close">×</button>
+    </div>
   </div>
   <div class="win95-body">
     <h2>AGENT CANVAS</h2>
@@ -131,7 +141,11 @@ PRESS ANY KEY OR CLICK ANYWHERE TO ENTER
 <section class="win95 site-win hidden" id="win-sdk" aria-label="Agent SDK">
   <div class="win95-bar">
     <span>◤ C:\PRODUCTS\AGENT_SDK.TXT</span>
-    <div class="btns"><button type="button" data-close="win-sdk" title="close">×</button></div>
+    <div class="btns">
+      <button type="button" data-min="win-sdk" title="minimize">_</button>
+      <button type="button" data-max="win-sdk" title="maximize">□</button>
+      <button type="button" data-close="win-sdk" title="close">×</button>
+    </div>
   </div>
   <div class="win95-body">
     <h2>SOFTWARE AGENT SDK</h2>
@@ -150,7 +164,11 @@ PRESS ANY KEY OR CLICK ANYWHERE TO ENTER
 <section class="win95 site-win hidden" id="win-cloud" aria-label="OpenHands Cloud">
   <div class="win95-bar">
     <span>◤ C:\PRODUCTS\CLOUD.TXT</span>
-    <div class="btns"><button type="button" data-close="win-cloud" title="close">×</button></div>
+    <div class="btns">
+      <button type="button" data-min="win-cloud" title="minimize">_</button>
+      <button type="button" data-max="win-cloud" title="maximize">□</button>
+      <button type="button" data-close="win-cloud" title="close">×</button>
+    </div>
   </div>
   <div class="win95-body">
     <h2>OPENHANDS CLOUD ☁</h2>
@@ -178,6 +196,11 @@ PRESS ANY KEY OR CLICK ANYWHERE TO ENTER
   <div id="tracks"></div>
   <div id="track-info">SELECT A TRACK TO DECODE ITS FEATURE_</div>
   <button type="button" id="audio-btn">♪ SYNTH: OFF</button>
+</div>
+
+<div id="start-menu" class="hidden" role="menu" aria-label="Start menu">
+  <div id="start-menu-head">◤ OPENHANDS.EXE</div>
+  <div id="start-menu-items"></div>
 </div>
 
 <div id="taskbar">

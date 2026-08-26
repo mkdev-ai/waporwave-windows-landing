@@ -29,8 +29,8 @@ function enterWorld() {
   if (booted) return;
   booted = true;
   boot.style.display = "none";
-  setWindowVisible("win-capabilities", true);
-  setWindowVisible("win-help", true);
+  openWindow("win-capabilities");
+  openWindow("win-help");
 }
 boot.addEventListener("click", enterWorld);
 addEventListener("keydown", enterWorld);
@@ -65,9 +65,9 @@ gridWrap.addEventListener("click", (e) => {
   setTimeout(() => r.remove(), 1000);
 });
 
-/* ---------- window system: registry, taskbar, close, drag ---------- */
+/* ---------- window system: registry, taskbar, start menu, drag ---------- */
 // px of a window that must stay on screen: wide enough that a window clamped to
-// the left edge still shows some grabbable bar left of its buttons (~46px).
+// the left edge still shows some grabbable bar left of its buttons (~64px).
 const DRAG_MARGIN = 80;
 
 const WINDOWS = [
@@ -77,46 +77,144 @@ const WINDOWS = [
   { id: "win-sdk", label: "AGENT_SDK.TXT" },
   { id: "win-cloud", label: "CLOUD.TXT" }
 ];
-
-function setWindowVisible(id, visible) {
-  const win = document.getElementById(id);
-  if (!win) return;
-  win.classList.toggle("hidden", !visible);
-  if (visible) {
-    // A window stranded fully off-screen (e.g. by a viewport resize) snaps back
-    // to its CSS home position so the taskbar can never lose it for good.
-    const r = win.getBoundingClientRect();
-    if (r.right < 0 || r.left > window.innerWidth || r.bottom < 0 || r.top > window.innerHeight) {
-      win.style.left = "";
-      win.style.right = "";
-      win.style.top = "";
-      win.style.bottom = "";
-    }
-    win.style.zIndex = ++topZ;
-  }
-  const btn = document.querySelector('[data-win-btn="' + id + '"]');
-  if (btn) btn.classList.toggle("active", visible);
-}
+// Per-window lifecycle: "open" (visible, taskbar button active),
+// "min" (hidden, taskbar button kept), "closed" (hidden, no taskbar button —
+// reopen from the start menu).
+const winState = Object.fromEntries(WINDOWS.map(({ id }) => [id, "closed"]));
 
 const taskButtons = document.getElementById("task-buttons");
-WINDOWS.forEach(({ id, label }) => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.textContent = label;
-  b.dataset.winBtn = id;
-  b.addEventListener("click", () => {
-    const win = document.getElementById(id);
-    setWindowVisible(id, win.classList.contains("hidden"));
+const startMenu = document.getElementById("start-menu");
+const startMenuItems = document.getElementById("start-menu-items");
+
+function renderStartMenu() {
+  startMenuItems.innerHTML = "";
+  WINDOWS.forEach(({ id, label }) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    const state = winState[id];
+    item.textContent = "▸ " + label +
+      (state === "open" ? " — RUNNING" : state === "min" ? " — MINIMIZED" : "");
+    item.addEventListener("click", () => {
+      openWindow(id);
+      startMenu.classList.add("hidden");
+    });
+    startMenuItems.appendChild(item);
   });
-  taskButtons.appendChild(b);
-});
+}
 
+function syncWindowUI(id) {
+  const win = document.getElementById(id);
+  const state = winState[id];
+  win.classList.toggle("hidden", state !== "open");
+  let btn = taskButtons.querySelector('[data-win-btn="' + id + '"]');
+  if (state === "closed") {
+    if (btn) btn.remove();
+  } else {
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = WINDOWS.find((w) => w.id === id).label;
+      btn.dataset.winBtn = id;
+      btn.addEventListener("click", () => {
+        // Win95 taskbar semantics: clicking the open window's button minimizes
+        // it, clicking a minimized window's button restores it.
+        if (winState[id] === "open") minimizeWindow(id);
+        else openWindow(id);
+      });
+      taskButtons.appendChild(btn);
+    }
+    btn.classList.toggle("active", state === "open");
+  }
+  renderStartMenu();
+}
+
+function openWindow(id) {
+  const win = document.getElementById(id);
+  if (!win) return;
+  winState[id] = "open";
+  // A window stranded fully off-screen (e.g. by a viewport resize) snaps back
+  // to its CSS home position so it can never be lost for good.
+  const r = win.getBoundingClientRect();
+  if (r.right < 0 || r.left > window.innerWidth || r.bottom < 0 || r.top > window.innerHeight) {
+    win.style.left = "";
+    win.style.right = "";
+    win.style.top = "";
+    win.style.bottom = "";
+  }
+  win.style.zIndex = ++topZ;
+  syncWindowUI(id);
+}
+
+function minimizeWindow(id) {
+  winState[id] = "min";
+  syncWindowUI(id);
+}
+
+function closeWindow(id) {
+  const win = document.getElementById(id);
+  // Restore geometry before hiding so a closed-then-reopened window comes back
+  // at its normal size, not stuck full screen.
+  if (win && win.classList.contains("maximized")) toggleMaximize(win);
+  winState[id] = "closed";
+  syncWindowUI(id);
+}
+
+function toggleMaximize(win) {
+  const btn = win.querySelector("[data-max]");
+  if (win.classList.contains("maximized")) {
+    win.classList.remove("maximized");
+    try {
+      const saved = JSON.parse(win.dataset.prevStyle || "{}");
+      const [left, top, right, bottom] = saved.rect || [];
+      win.style.left = left || "";
+      win.style.top = top || "";
+      win.style.right = right || "";
+      win.style.bottom = bottom || "";
+    } catch { /* geometry stays at CSS home on malformed snapshot */ }
+    win.style.zIndex = ++topZ;
+    if (btn) { btn.textContent = "□"; btn.title = "maximize"; }
+  } else {
+    // Snapshot bare geometry values (rect + z-index). A style-string snapshot
+    // would smuggle in a chromium generated `inset` shorthand and poison the
+    // restore.
+    win.dataset.prevStyle = JSON.stringify({
+      rect: [win.style.left, win.style.top, win.style.right, win.style.bottom],
+      z: win.style.zIndex
+    });
+    win.style.inset = "";
+    win.style.left = "";
+    win.style.top = "";
+    win.style.right = "";
+    win.style.bottom = "";
+    win.classList.add("maximized");
+    win.style.zIndex = ++topZ;
+    if (btn) { btn.textContent = "❐"; btn.title = "restore"; }
+  }
+}
+
+document.querySelectorAll("[data-min]").forEach((btn) => {
+  btn.addEventListener("click", () => minimizeWindow(btn.dataset.min));
+});
+document.querySelectorAll("[data-max]").forEach((btn) => {
+  btn.addEventListener("click", () => toggleMaximize(document.getElementById(btn.dataset.max)));
+});
 document.querySelectorAll("[data-close]").forEach((btn) => {
-  btn.addEventListener("click", () => setWindowVisible(btn.dataset.close, false));
+  btn.addEventListener("click", () => closeWindow(btn.dataset.close));
 });
 
-document.getElementById("start-btn").addEventListener("click", () => {
-  setWindowVisible("win-help", true);
+document.getElementById("start-btn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  renderStartMenu();
+  startMenu.classList.toggle("hidden");
+});
+document.addEventListener("pointerdown", (e) => {
+  if (!startMenu.classList.contains("hidden") &&
+      !startMenu.contains(e.target) && e.target.id !== "start-btn") {
+    startMenu.classList.add("hidden");
+  }
+});
+addEventListener("keydown", (e) => {
+  if (e.key === "Escape") startMenu.classList.add("hidden");
 });
 
 document.querySelectorAll(".win95").forEach((win) => {
@@ -126,6 +224,7 @@ document.querySelectorAll(".win95").forEach((win) => {
   let dragging = false;
   bar.addEventListener("pointerdown", (e) => {
     if (e.target.tagName === "BUTTON") return;
+    if (win.classList.contains("maximized")) return;
     dragging = true;
     dx = e.clientX - win.offsetLeft;
     dy = e.clientY - win.offsetTop;
@@ -136,10 +235,11 @@ document.querySelectorAll(".win95").forEach((win) => {
     if (!dragging) return;
     const left = Math.min(Math.max(e.clientX - dx, DRAG_MARGIN - win.offsetWidth), window.innerWidth - DRAG_MARGIN);
     const top = Math.min(Math.max(e.clientY - dy, 0), window.innerHeight - DRAG_MARGIN);
-    win.style.left = left + "px";
-    win.style.top = top + "px";
-    win.style.right = "auto";
-    win.style.bottom = "auto";
+    // `style.setProperty("inset", …)` keeps the shorthand stable: plain
+    // `style.inset = …` gets split into per-side properties in chromium, and
+    // subsequent left/top assignments then serialize back as an `inset`
+    // shorthand — breaking the geometry snapshot maximize/restore relies on.
+    win.style.setProperty("inset", top + "px auto auto " + left + "px");
   });
   bar.addEventListener("pointerup", () => {
     dragging = false;
@@ -150,7 +250,7 @@ document.querySelectorAll(".win95").forEach((win) => {
 document.querySelectorAll(".sign").forEach((sign) => {
   sign.addEventListener("click", (e) => {
     e.preventDefault();
-    setWindowVisible(sign.dataset.win, true);
+    openWindow(sign.dataset.win);
   });
 });
 
