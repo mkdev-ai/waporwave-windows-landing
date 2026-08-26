@@ -16,7 +16,7 @@ A DOS-style boot screen types itself out, then the scene loads: a striped sun fl
 
 ## Features
 
-- 🖥️ **Win95 window manager** — draggable, closable, minimizable windows with a working taskbar and z-ordering (windows can never be dragged fully off-screen; stranded ones snap back home)
+- 🖥️ **Win95 window manager** — full lifecycle: `_` minimizes to the taskbar, `×` closes completely (taskbar button removed), `□`/`❐` maximizes to full screen and restores to exact previous size/position. Closed windows reopen from the **◤ START** menu, which lists every window with its live state (RUNNING / MINIMIZED). Drag-clamped on-screen with z-ordering
 - ☀️ **Theme cycling** — click the sun to shift the timeline through 4 palettes (dusk, dawn, midnight, overdrive)
 - 🌊 **Interactive grid floor** — click the floor to spawn ripples (GRID FX toggle in the taskbar)
 - 🎛️ **Mixtape deck** — feature tracks that update the deck display
