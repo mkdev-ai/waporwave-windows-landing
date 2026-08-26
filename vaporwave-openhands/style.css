@@ -100,17 +100,26 @@ body {
 /* ================= GRID FLOOR ================= */
 #grid-wrap {
   position: fixed; left: 0; right: 0; bottom: 0; height: 36vh;
-  perspective: 320px; overflow: hidden; z-index: 1;
+  /* Perspective in vh keeps the projection geometry viewport-relative: the
+     horizon distance cap is perspective/tan(angle), so a fixed px value would
+     shrink the floor on tall screens. */
+  perspective: 100vh; overflow: hidden; z-index: 1;
   background: linear-gradient(transparent, rgb(4 0 18 / 90%) 35%);
 }
+/* The plane is oversized and pivoted on its bottom edge so that after the 3D
+   rotation it still fills the whole wrap: full viewport width at the bottom
+   edge AND at the horizon line (~34.6vh), which lands just inside the wrap so
+   the glowing top border stays visible. */
 #grid {
-  position: absolute; inset: -100% -50% 0;
+  position: absolute; bottom: 0; left: -100vw;
+  width: 300vw; height: 97vh;
   background:
     linear-gradient(var(--grid-dim) 2px, transparent 2px),
     linear-gradient(90deg, var(--grid-dim) 2px, transparent 2px),
     linear-gradient(rgb(6 0 22 / 55%), rgb(6 0 22 / 88%));
   background-size: 60px 60px;
-  transform: rotateX(72deg);
+  transform: rotateX(60deg);
+  transform-origin: 50% 100%;
   animation: gridScroll 1.4s linear infinite;
   border-top: 3px solid var(--grid);
   box-shadow: 0 -6px 40px var(--grid-dim);
@@ -386,6 +395,7 @@ body {
   #sun-hint { top: calc(10% + min(38vmin, 340px) + 10px); font-size: 10px; }
   .mountain { bottom: 30vh; }
   #grid-wrap { height: 30vh; }
+  #grid { height: 78vh; } /* keep the horizon line just inside the shorter wrap */
   .palm { bottom: 27vh; }
   #palm-a { width: 56px; }
   #palm-b, #statue, #checker, #vhs { display: none; }
