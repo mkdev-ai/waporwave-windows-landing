@@ -346,18 +346,6 @@ body {
   50% { filter: drop-shadow(0 0 5px rgb(0 0 0 / 90%)) drop-shadow(0 0 24px var(--neon-purple)); }
 }
 
-/* Floating checkerboard plane */
-#checker {
-  position: fixed; left: 45vw; bottom: 29vh; z-index: 3; width: 90px; height: 90px;
-  background: repeating-conic-gradient(var(--neon-pink) 0% 25%, rgb(0 0 10 / 10%) 0% 50%) 0 0 / 22px 22px;
-  opacity: 0.45;
-  animation: floatChk 9s ease-in-out infinite;
-}
-@keyframes floatChk {
-  0%, 100% { transform: rotateX(64deg) rotate(8deg) translateY(0); }
-  50% { transform: rotateX(64deg) rotate(8deg) translateY(-14px); }
-}
-
 /* VHS overlay glyph */
 #vhs {
   position: fixed; top: 12px; right: 16px; z-index: 30;
@@ -398,7 +386,7 @@ body {
   #grid { height: 78vh; } /* keep the horizon line just inside the shorter wrap */
   .palm { bottom: 27vh; }
   #palm-a { width: 56px; }
-  #palm-b, #statue, #checker, #vhs { display: none; }
+  #palm-b, #statue, #vhs { display: none; }
   .dolphin { bottom: 27vh; width: 48px; }
   #dolphin-a { left: 20vw; }
   #dolphin-b { left: 62vw; }
