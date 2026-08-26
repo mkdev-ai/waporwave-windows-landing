@@ -208,6 +208,12 @@ body {
 #win-sdk { left: 32vw; top: 23vh; }
 #win-cloud { left: 38vw; top: 29vh; }
 
+/* Maximized: fill the screen above the taskbar (40px) + marquee (26px).
+   !important is required: per-window ID rules (#win-help etc.) and the mobile
+   inset override would otherwise win over this class. */
+.win95.maximized { inset: 0 0 66px 0 !important; width: auto !important; max-height: none; }
+.win95.maximized .win95-body { max-height: calc(100% - 26px); overflow-y: auto; }
+
 /* ================= NEON MALL ================= */
 #mall {
   position: fixed; bottom: 37vh; right: 3vw; z-index: 5; text-align: center;
@@ -298,6 +304,26 @@ body {
 #taskbar button.active { border-color: #0a0a0a #fff #fff #0a0a0a; background: #a8adb3; }
 #task-buttons { display: flex; gap: 6px; flex: 0 0 auto; }
 #gridfx-btn { margin-left: auto; color: #000080; flex: 0 0 auto; }
+
+/* ================= START MENU ================= */
+#start-menu {
+  position: fixed; left: 6px; bottom: 70px; z-index: 1000; min-width: 250px;
+  background: #c3c7cb; border: 2px solid; border-color: #fff #0a0a0a #0a0a0a #fff;
+  box-shadow: 6px 6px 0 rgb(0 0 0 / 45%), 0 0 30px var(--grid-dim);
+  font-family: "Courier New", monospace;
+}
+#start-menu.hidden { display: none; }
+#start-menu-head {
+  background: linear-gradient(90deg, #000080, #1084d0); color: #fff;
+  font-size: 12px; font-weight: bold; letter-spacing: 2px; padding: 5px 8px;
+}
+#start-menu-items { display: flex; flex-direction: column; padding: 4px; gap: 2px; }
+#start-menu-items button {
+  font-family: inherit; font-size: 12px; text-align: left; padding: 7px 10px;
+  background: transparent; border: 1px solid transparent; cursor: pointer; color: #000;
+  white-space: nowrap;
+}
+#start-menu-items button:hover { background: #000080; color: #fff; }
 
 /* ================= VAPORWAVE GRAPHICS =================
    All graphics are original hand-crafted inline SVG / pure CSS. */
@@ -399,4 +425,6 @@ body {
   #win-capabilities, #win-help, #win-canvas, #win-sdk, #win-cloud { inset: 6vh auto auto 3vw; }
   #taskbar { height: 46px; }
   #taskbar button { min-height: 38px; padding: 8px 12px; }
+  #start-menu { bottom: 76px; }
+  .win95.maximized { inset: 0 0 72px 0 !important; }
 }
